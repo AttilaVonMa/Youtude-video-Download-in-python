@@ -1,0 +1,34 @@
+from pytube import Playlist
+from moviepy.editor import VideoFileClip, AudioFileClip, CompositeAudioClip
+import os
+
+pl=Playlist("https://www.youtube.com/watch?v=4QP_39yyGJM&list=PLtngEjKSkXc04VBKxJR-ZNFKhyxW2Uny2")
+
+
+
+
+for video in pl.videos:
+        video.streams.filter(abr="160kbps", progressive=False).first().download(filename=video.title+" audio.mp3")
+        print(video.title+" audio completed")   
+        video.streams.filter(res="1080p").first().download(filename=video.title+" video.mp4")
+        print(video.title+" video completed ")
+        
+        HD=VideoFileClip(video.title+" video.mp4")
+        Audio=AudioFileClip(video.title+" audio.mp3")
+        
+        composite_audio = CompositeAudioClip([Audio])
+        HD=HD.set_audio(composite_audio)
+        HD.write_videofile(filename=video.title+" HD.mp4", codec='libx264', audio_codec='aac',preset='ultrafast',verbose=False)
+        
+        path1 = video.title+" audio.mp3"
+        if os.path.exists(path1):  
+                os.remove(path1)  
+        else:
+                print('no such file:%s')  
+        
+        path2 =video.title+" video.mp4"
+        if os.path.exists(path2):  
+                os.remove(path2)  
+        else:
+                print('no such file:%s') 
+        print(video.title+" HD output completed")
